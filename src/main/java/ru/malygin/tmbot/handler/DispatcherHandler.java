@@ -50,7 +50,6 @@ public final class DispatcherHandler {
         CallbackQuery query = update.getCallbackQuery();
         if (query != null)
             return query
-                    .getMessage()
                     .getFrom()
                     .getId();
         throw new IllegalArgumentException("Wrong update format, userId not found!");
