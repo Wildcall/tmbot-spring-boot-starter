@@ -24,7 +24,7 @@ public abstract class AbstractHandler {
                     if (annotation != null) {
                         Class<? extends BotApiObject> type = annotation.type();
                         String path = annotation.path();
-                        if (Arrays.equals(m.getParameterTypes(), new Class[]{type})) {
+                        if (Arrays.equals(m.getParameterTypes(), new Class[]{Long.class, Long.class, type})) {
                             Map<String,Method> methodMap = botApiMethodMap.computeIfAbsent(type, k -> new HashMap<>());
                             if (methodMap.put(path, m) != null)
                                 throw new RuntimeException(String.format(
@@ -44,6 +44,8 @@ public abstract class AbstractHandler {
     }
 
     public ReplyPayload handle(BotState state,
+                               Long userId,
+                               Long chatId,
                                BotApiObject botApiObject) {
         Class<? extends BotApiObject> aClass = botApiObject.getClass();
         Map<String, Method> methodMap = botApiMethodMap.get(aClass);
@@ -57,7 +59,7 @@ public abstract class AbstractHandler {
                 log.error("Handler for path [{}] not found", state.getPath());
                 return null;
             }
-            return (ReplyPayload) method.invoke(this, botApiObject);
+            return (ReplyPayload) method.invoke(this, userId, chatId, botApiObject);
         } catch (IllegalAccessException | InvocationTargetException e) {
             log.error("ERROR LOGGING: {}", e.getMessage());
         }
