@@ -5,7 +5,8 @@ import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import ru.malygin.tmbot.ReplyPayload;
 import ru.malygin.tmbot.exception.TmbotException;
-import ru.malygin.tmbot.exception.TmbotExceptionHandler;
+import ru.malygin.tmbot.exception.AbstractTmbotExceptionHandler;
+import ru.malygin.tmbot.exception.TmbotExceptionHandlerFactory;
 import ru.malygin.tmbot.handler.DispatcherHandler;
 
 import java.util.List;
@@ -15,15 +16,15 @@ import java.util.List;
 public final class DispatcherFilter {
 
     private final DispatcherHandler dispatcherHandler;
-    private final TmbotExceptionHandler tmbotExceptionHandler;
+    private final AbstractTmbotExceptionHandler abstractTmbotExceptionHandler;
     private final List<Class<? extends AbstractFilter>> filters;
     private final FilterFactory filterFactory;
 
     public DispatcherFilter(DispatcherHandler dispatcherHandler,
-                            TmbotExceptionHandler tmbotExceptionHandler,
+                            TmbotExceptionHandlerFactory tmbotExceptionHandlerFactory,
                             FilterFactory filterFactory) {
         this.dispatcherHandler = dispatcherHandler;
-        this.tmbotExceptionHandler = tmbotExceptionHandler;
+        this.abstractTmbotExceptionHandler = tmbotExceptionHandlerFactory.getExceptionHandler();
         this.filterFactory = filterFactory;
         this.filters = filterFactory.getFilters();
     }
@@ -37,9 +38,13 @@ public final class DispatcherFilter {
                     return reply;
             }
             return dispatcherHandler.dispatch(update);
-        } catch (TmbotException e) {
+        } catch (Throwable e) {
             log.error("Error logging: {}", e.getMessage());
-            return tmbotExceptionHandler.handle(e);
+            if (e instanceof TmbotException) {
+                if (abstractTmbotExceptionHandler != null)
+                    return abstractTmbotExceptionHandler.handle((TmbotException) e);
+            }
+            return null;
         }
     }
 }

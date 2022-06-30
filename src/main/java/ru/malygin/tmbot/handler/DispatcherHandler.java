@@ -23,7 +23,7 @@ public final class DispatcherHandler {
     private final Cache cache;
     private final HandlersFactory handlersFactory;
 
-    public ReplyPayload dispatch(Update update) {
+    public ReplyPayload dispatch(Update update) throws Throwable {
         if (update == null)
             throw new TmbotException("Update must not be null");
         Long userId = TmbotUtils.getUserId(update);

@@ -1,16 +1,13 @@
 package ru.malygin.tmbot.filter;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-@Slf4j
 @Component
 public final class FilterFactory {
 
@@ -21,7 +18,6 @@ public final class FilterFactory {
         this.filtersMap = filtersMap
                 .stream()
                 .collect(Collectors.toUnmodifiableMap(AbstractFilter::getClass, Function.identity()));
-        initFilters(this.filtersMap.values());
         this.filters = this.filtersMap
                 .keySet()
                 .stream()
@@ -35,10 +31,6 @@ public final class FilterFactory {
 
     public AbstractFilter getFilter(Class<? extends AbstractFilter> clazz) {
         return this.filtersMap.get(clazz);
-    }
-
-    private void initFilters(Collection<? extends AbstractFilter> filters) {
-        filters.forEach(filter -> filter.init(filter));
     }
 
     private int orderComparator(Class<? extends AbstractFilter> o1,

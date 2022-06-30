@@ -5,7 +5,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import ru.malygin.tmbot.cache.Cache;
 import ru.malygin.tmbot.cache.DefaultCache;
-import ru.malygin.tmbot.exception.TmbotExceptionHandler;
 
 @Configuration
 public class TmbotConfig {
@@ -16,9 +15,4 @@ public class TmbotConfig {
         return new DefaultCache();
     }
 
-    @Bean
-    @ConditionalOnMissingBean
-    public TmbotExceptionHandler tmbotExceptionHandler() {
-        return new TmbotExceptionHandler();
-    }
 }

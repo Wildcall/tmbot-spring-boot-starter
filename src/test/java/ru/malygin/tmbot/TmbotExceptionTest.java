@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import ru.malygin.tmbot.exception.HandleTmbotException;
 import ru.malygin.tmbot.exception.TmbotException;
-import ru.malygin.tmbot.exception.TmbotExceptionHandler;
+import ru.malygin.tmbot.exception.AbstractTmbotExceptionHandler;
 
 @Slf4j
 public class TmbotExceptionTest {
@@ -28,7 +28,7 @@ public class TmbotExceptionTest {
         }
     }
 
-    public static class TestClass extends TmbotExceptionHandler {
+    public static class TestClass extends AbstractTmbotExceptionHandler {
 
         @HandleTmbotException(CustomTmbotExceptionWithHandler.class)
         public ReplyPayload handleCustomTmbotException(CustomTmbotExceptionWithHandler e) {
@@ -40,8 +40,9 @@ public class TmbotExceptionTest {
 
         public CustomTmbotExceptionWithHandler(String message,
                                                Long chatId,
+                                               Long userId,
                                                String text) {
-            super(message, chatId, text);
+            super(message, chatId, userId, text);
         }
 
         public CustomTmbotExceptionWithHandler(String message) {
@@ -53,8 +54,9 @@ public class TmbotExceptionTest {
 
         public CustomTmbotExceptionWithoutHandler(String message,
                                                   Long chatId,
+                                                  Long userId,
                                                   String text) {
-            super(message, chatId, text);
+            super(message, chatId, userId, text);
         }
 
         public CustomTmbotExceptionWithoutHandler(String message) {

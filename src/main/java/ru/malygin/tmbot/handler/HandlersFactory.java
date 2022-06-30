@@ -19,14 +19,9 @@ public final class HandlersFactory {
         this.handlers = handlers
                 .stream()
                 .collect(Collectors.toMap(AbstractHandler::getClass, Function.identity()));
-        initHandlers(this.handlers.values());
     }
 
     public Map<Class<? extends AbstractHandler>, AbstractHandler> getHandlers() {
         return handlers;
-    }
-
-    private void initHandlers(Collection<? extends AbstractHandler> handlers) {
-        handlers.forEach(handler -> handler.init(handler));
     }
 }
