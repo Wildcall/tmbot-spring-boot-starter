@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.bots.TelegramWebhookBot;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.botapimethods.BotApiMethodSerializable;
 import org.telegram.telegrambots.meta.api.methods.send.*;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -39,7 +40,6 @@ public class TelegramBot extends TelegramWebhookBot {
     public BotApiMethod<?> onWebhookUpdateReceived(Update update) {
         ReplyPayload replyPayload = dispatcherFilter.doFilter(update);
         if (replyPayload == null) return null;
-
         try {
             executePayload(replyPayload);
         } catch (TelegramApiException e) {
@@ -50,6 +50,8 @@ public class TelegramBot extends TelegramWebhookBot {
     }
 
     private void executePayload(ReplyPayload payload) throws TelegramApiException {
+        for (BotApiMethodSerializable item : payload.getBotApiMethodSerializableList()) execute(item);
+
         for (SendPhoto item : payload.getSendPhotoList()) execute(item);
 
         for (SendDocument item : payload.getSendDocumentList()) execute(item);
