@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.telegram.telegrambots.meta.api.interfaces.BotApiObject;
 import ru.malygin.tmbot.ReplyPayload;
 import ru.malygin.tmbot.cache.BotState;
+import ru.malygin.tmbot.exception.TmbotException;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -49,20 +50,14 @@ public abstract class AbstractHandler {
                                BotApiObject botApiObject) {
         Class<? extends BotApiObject> aClass = botApiObject.getClass();
         Map<String, Method> methodMap = botApiMethodMap.get(aClass);
-        if (methodMap == null) {
-            log.error("Handler for class [{}] not found", aClass);
-            return null;
-        }
+        if (methodMap == null) throw new TmbotException(String.format("Handler for class [%s] not found", aClass));
         try {
             Method method = methodMap.get(state.getPath());
-            if (method == null) {
-                log.error("Handler for path [{}] not found", state.getPath());
-                return null;
-            }
+            if (method == null) throw new TmbotException(
+                    String.format("Handler for path [%s] not found", state.getPath()));
             return (ReplyPayload) method.invoke(this, userId, chatId, botApiObject);
         } catch (IllegalAccessException | InvocationTargetException e) {
-            log.error("ERROR LOGGING: {}", e.getMessage());
+            throw new RuntimeException(String.format("Invoke error for method [%s]", e.getMessage()));
         }
-        return null;
     }
 }

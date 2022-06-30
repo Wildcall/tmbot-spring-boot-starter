@@ -11,11 +11,11 @@ import ru.malygin.tmbot.ReplyPayload;
 import ru.malygin.tmbot.TmbotUtils;
 import ru.malygin.tmbot.cache.BotState;
 import ru.malygin.tmbot.cache.Cache;
+import ru.malygin.tmbot.exception.TmbotException;
 
 import java.util.Arrays;
 import java.util.Objects;
 
-@Slf4j
 @RequiredArgsConstructor
 @Service
 public final class DispatcherHandler {
@@ -24,7 +24,8 @@ public final class DispatcherHandler {
     private final HandlersFactory handlersFactory;
 
     public ReplyPayload dispatch(Update update) {
-        if (update == null) return null;
+        if (update == null)
+            throw new TmbotException("Update must not be null");
         Long userId = TmbotUtils.getUserId(update);
         Long chatId = TmbotUtils.getChatId(update);
 
@@ -36,7 +37,6 @@ public final class DispatcherHandler {
         if (handler != null) {
             return handler.handle(state, userId, chatId, TmbotUtils.getNotNullBotApiObject(update));
         } else
-            log.info("Handler for state: [{}] not found", state.name());
-        return null;
+            throw new TmbotException(String.format("Handler for state: [%s] not found", state.name()));
     }
 }
